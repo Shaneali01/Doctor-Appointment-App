@@ -70,13 +70,13 @@ const Hero = () => {
 
         {/* 24/7 Service Badge */}
         <div className="absolute top-9 right-9 p-2 text-center">
-          <img src="../../../public/assets/SocialMedia/Rectangle 6.png" className="absolute" alt="" />
-          <img src="../../../public/assets/SocialMedia/Group 7.png" className="relative mt-2.5 ml-2.5" alt="" />
+          <img src="../../../assets/SocialMedia/Rectangle 6.png" className="absolute" alt="" />
+          <img src="../../../assets/SocialMedia/Group 7.png" className="relative mt-2.5 ml-2.5" alt="" />
         </div>
 
         {/* Professionals Badge */}
         <div className="absolute bottom-4 left-4 p-2 rounded-full flex items-center gap-2">
-          <img src="../../../public/assets/SocialMedia/Group 8.png" alt="" />
+          <img src="../../../assets/SocialMedia/Group 8.png" alt="" />
         </div>
       </div>
     </section>

@@ -32,11 +32,39 @@ const DoctorApplication = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { register, handleSubmit, watch, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isValid },
+    trigger,
+  } = useForm({ mode: "onChange" });
   const formData = watch();
 
-  const nextStep = () => {
-    if (currentStep < steps.length - 1) {
+  const nextStep = async () => {
+    let fieldsToValidate = [];
+    switch (currentStep) {
+      case 0:
+        fieldsToValidate = ["name", "email", "password"];
+        break;
+      case 1:
+        fieldsToValidate = ["specialty", "degree"];
+        break;
+      case 2:
+        fieldsToValidate = ["experience", "fees"];
+        break;
+      case 3:
+        fieldsToValidate = ["address", "about"];
+        break;
+      case 4:
+        fieldsToValidate = ["name", "email", "password", "specialty", "degree", "experience", "fees", "address", "about"];
+        break;
+      default:
+        break;
+    }
+
+    const isStepValid = await trigger(fieldsToValidate);
+    if (isStepValid && currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -102,7 +130,7 @@ const DoctorApplication = () => {
   };
 
   return (
-    <div data-aos="zoom-in" className="min-h-screen mt-12 py-8 px-4 sm:px-6 lg:px-8 bg-white  ">
+    <div data-aos="zoom-in" className="min-h-screen mt-12 py-8 px-4 sm:px-6 lg:px-8 bg-white">
       <style>
         {`
           @keyframes iconBounce {
@@ -153,7 +181,7 @@ const DoctorApplication = () => {
       </style>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10 py-10">
-          <h1 className="text-4xl sm:text-5xl  text-[#007E85] font-extrabold tracking-tight">
+          <h1 className="text-4xl sm:text-5xl text-[#007E85] font-extrabold tracking-tight">
             Become a Doctor
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mt-3 max-w-3xl mx-auto leading-relaxed">
@@ -171,7 +199,7 @@ const DoctorApplication = () => {
           </div>
 
           <div className="w-full md:w-1/2 p-8 md:p-10 bg-gray-50">
-            <div className="flex flex-wrap items-center  mb-8 ">
+            <div className="flex flex-wrap items-center mb-8">
               {steps.map((step, index) => (
                 <div key={index} className="flex items-center w-[18%] sm:w-[18%]">
                   <div
@@ -213,7 +241,15 @@ const DoctorApplication = () => {
                     <div className="space-y-6">
                       <div className="input-container">
                         <input
-                          {...register("name", { required: "Full name is required" })}
+                          {...register("name", {
+                            required: "Full name is required",
+                            minLength: { value: 2, message: "Name must be at least 2 characters" },
+                            maxLength: { value: 50, message: "Name must not exceed 50 characters" },
+                            pattern: {
+                              value: /^[A-Za-z\s]+$/,
+                              message: "Name can only contain letters and spaces",
+                            },
+                          })}
                           placeholder=" "
                           className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none text-gray-700 bg-white"
                           id="name"
@@ -241,7 +277,12 @@ const DoctorApplication = () => {
                         <input
                           {...register("password", {
                             required: "Password is required",
-                            minLength: { value: 6, message: "Password must be at least 6 characters" },
+                            minLength: { value: 8, message: "Password must be at least 8 characters" },
+                            maxLength: { value: 50, message: "Password must not exceed 50 characters" },
+                            pattern: {
+                              value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+                              message: "Password must include uppercase, lowercase, number, and special character",
+                            },
                           })}
                           type="password"
                           placeholder=" "
@@ -266,7 +307,7 @@ const DoctorApplication = () => {
                           className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none text-gray-700 bg-white"
                           id="specialty"
                         >
-                          <option value="" disabled hidden></option>
+                          <option value="" disabled hidden>Select Specialty</option>
                           {specialties.map((specialty) => (
                             <option key={specialty} value={specialty}>
                               {specialty}
@@ -278,7 +319,11 @@ const DoctorApplication = () => {
                       </div>
                       <div className="input-container">
                         <input
-                          {...register("degree", { required: "Degree is required" })}
+                          {...register("degree", {
+                            required: "Degree is required",
+                            minLength: { value: 2, message: "Degree must be at least 2 characters" },
+                            maxLength: { value: 100, message: "Degree must not exceed 100 characters" },
+                          })}
                           placeholder=" "
                           className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none text-gray-700 bg-white"
                           id="degree"
@@ -300,6 +345,8 @@ const DoctorApplication = () => {
                           {...register("experience", {
                             required: "Experience is required",
                             pattern: { value: /^[0-9]+$/, message: "Please enter a valid number" },
+                            min: { value: 0, message: "Experience cannot be negative" },
+                            max: { value: 100, message: "Experience cannot exceed 100 years" },
                           })}
                           placeholder=" "
                           className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none text-gray-700 bg-white"
@@ -312,7 +359,9 @@ const DoctorApplication = () => {
                         <input
                           {...register("fees", {
                             required: "Fees are required",
-                            pattern: { value: /^[0-9]+(\.[0-9]{1,2})?$/, message: "Please enter a valid amount" },
+                            pattern: { value: /^[0-9]+(\.[0-9]{1,2})?$/, message: "Please enter a valid amount (e.g., 150.00)" },
+                            min: { value: 0, message: "Fees cannot be negative" },
+                            max: { value: 10000, message: "Fees cannot exceed 10000" },
                           })}
                           placeholder=" "
                           className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none text-gray-700 bg-white"
@@ -332,7 +381,11 @@ const DoctorApplication = () => {
                     <div className="space-y-6">
                       <div className="input-container">
                         <input
-                          {...register("address", { required: "Address is required" })}
+                          {...register("address", {
+                            required: "Address is required",
+                            minLength: { value: 5, message: "Address must be at least 5 characters" },
+                            maxLength: { value: 200, message: "Address must not exceed 200 characters" },
+                          })}
                           placeholder=" "
                           className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none text-gray-700 bg-white"
                           id="address"
@@ -342,7 +395,11 @@ const DoctorApplication = () => {
                       </div>
                       <div className="input-container">
                         <textarea
-                          {...register("about", { required: "About section is required" })}
+                          {...register("about", {
+                            required: "About section is required",
+                            minLength: { value: 10, message: "About must be at least 10 characters" },
+                            maxLength: { value: 500, message: "About must not exceed 500 characters" },
+                          })}
                           placeholder=" "
                           className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none text-gray-700 bg-white"
                           rows="4"
@@ -353,13 +410,26 @@ const DoctorApplication = () => {
                       </div>
                       <div className="input-container">
                         <input
-                          {...register("image")}
+                          {...register("image", {
+                            validate: (files) => {
+                              if (!files || files.length === 0) return true; // Image is optional
+                              const file = files[0];
+                              const validTypes = ["image/jpeg", "image/png", "image/gif"];
+                              if (!validTypes.includes(file.type)) {
+                                return "Image must be JPG, PNG, or GIF";
+                              }
+                              if (file.size > 5 * 1024 * 1024) {
+                                return "Image size must not exceed 5MB";
+                              }
+                              return true;
+                            },
+                          })}
                           type="file"
                           accept="image/*"
                           className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none text-gray-700 bg-white"
                           id="image"
                         />
-                        <label htmlFor="image">Profile Image</label>
+                        <label htmlFor="image">Profile Image (Optional)</label>
                         {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>}
                       </div>
                     </div>
@@ -399,7 +469,18 @@ const DoctorApplication = () => {
                   <button
                     type="button"
                     onClick={nextStep}
-                    className="px-8 py-3 cursor-pointer bg-gradient-to-r from-[#007E85] to-[#00A3AD] text-white font-semibold rounded-full hover:from-[#006668] hover:to-[#008A93] transition-all w-full sm:w-auto sm:ml-auto shadow-md"
+                    disabled={currentStep === 0 && (errors.name || errors.email || errors.password) ||
+                              currentStep === 1 && (errors.specialty || errors.degree) ||
+                              currentStep === 2 && (errors.experience || errors.fees) ||
+                              currentStep === 3 && (errors.address || errors.about)}
+                    className={`px-8 py-3 bg-gradient-to-r from-[#007E85] to-[#00A3AD] text-white font-semibold rounded-full transition-all w-full sm:w-auto sm:ml-auto shadow-md ${
+                      (currentStep === 0 && (errors.name || errors.email || errors.password)) ||
+                      (currentStep === 1 && (errors.specialty || errors.degree)) ||
+                      (currentStep === 2 && (errors.experience || errors.fees)) ||
+                      (currentStep === 3 && (errors.address || errors.about))
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:from-[#006668] hover:to-[#008A93]"
+                    }`}
                   >
                     Next
                   </button>
@@ -407,9 +488,9 @@ const DoctorApplication = () => {
                   <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                     <button
                       type="submit"
-                      disabled={isSubmitting}
-                      className={`px-8 py-3 bg-gradient-to-r from-[#007E85] to-[#00A3AD] text-white font-semibold rounded-full hover:from-[#006668] hover:to-[#008A93] transition-all flex items-center justify-center w-full sm:w-auto shadow-md ${
-                        isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                      disabled={isSubmitting || !isValid}
+                      className={`px-8 py-3 bg-gradient-to-r from-[#007E85] to-[#00A3AD] text-white font-semibold rounded-full transition-all flex items-center justify-center w-full sm:w-auto shadow-md ${
+                        isSubmitting || !isValid ? "opacity-50 cursor-not-allowed" : "hover:from-[#006668] hover:to-[#008A93]"
                       }`}
                     >
                       {isSubmitting ? (

@@ -106,13 +106,7 @@ const Profile = () => {
               {user.email || "user@example.com"}
             </p>
             <div className="flex justify-center sm:justify-start gap-4">
-              <Link
-                to="/edit-profile"
-                className="flex items-center text-[#008080] hover:text-[#006666] text-sm font-semibold transition-colors"
-              >
-                <Pencil size={16} className="mr-1" />
-                Edit Profile
-              </Link>
+             
               <button
                 onClick={handleLogout}
                 className="flex items-center text-red-600 hover:text-red-800 text-sm font-semibold transition-colors"

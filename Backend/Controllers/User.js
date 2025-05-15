@@ -3,8 +3,8 @@ import User from '../Models/User.js'
 import bcrypt from 'bcryptjs';
 import cloudinary from '../Config/Cloudinary.js';
 import { mongoose } from 'mongoose';
-import Stripe from 'stripe';
 import dotenv from 'dotenv';
+import Stripe from "stripe";
 dotenv.config();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 

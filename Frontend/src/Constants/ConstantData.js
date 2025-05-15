@@ -117,58 +117,58 @@ export  const stats = [
   export const services = [
     {
       title: 'Dental treatments',
-      image: '../../public/assets/Services/Dentist.png',
+      image: '../../assets/Services/Dentist.png',
       description: 'Lorem ipsum dolor sit amet consectetur tur adipiscing elit semper dalaracc lacus vel facilisis volutpat est velitom.',
       link:"https://www.betterhealth.vic.gov.au/health/conditionsandtreatments/dental-treatment"
     },
     {
       title: 'Bones treatments',
-      image:'../../public/assets/Services/Bones treatment.png',
+      image:'../../assets/Services/Bones treatment.png',
       description: 'Lorem ipsum dolor sit amet consectetur tur adipiscing elit semper dalaracc lacus vel facilisis volutpat est velitom.',
       link:"https://www.betterhealth.vic.gov.au/health/conditionsandtreatments/bone-fractures"
     },
     {
       title: 'Diagnosis',
-      image: '../../public/assets/Services/Diagnosis.png',
+      image: '../../assets/Services/Diagnosis.png',
       description: 'Lorem ipsum dolor sit amet consectetur tur adipiscing elit semper dalaracc lacus vel facilisis volutpat est velitom.',
       link:"https://www.ncbi.nlm.nih.gov/books/NBK338593/"
     },
     {
       title: 'Cardiology',
-      image: '../../public/assets/Services/Cardiology.pnjg.png',
+      image: '../../assets/Services/Cardiology.pnjg.png',
       description: 'Lorem ipsum dolor sit amet consectetur tur adipiscing elit semper dalaracc lacus vel facilisis volutpat est velitom.',
       link:"https://my.clevelandclinic.org/health/diagnostics/16832-cardiac-catheterization"
     },
     {
       title: 'Surgery',
-      image: '../../public/assets/Services/Surgery.png',
+      image: '../../assets/Services/Surgery.png',
       description: 'Lorem ipsum dolor sit amet consectetur tur adipiscing elit semper dalaracc lacus vel facilisis volutpat est velitom.',
       link:"https://www.britannica.com/science/surgery-medicine",
     },
     {
       title: 'Eye care',
-      image: '../../public/assets/Services/EyeCare.png',
+      image: '../../assets/Services/EyeCare.png',
       description: 'Lorem ipsum dolor sit amet consectetur tur adipiscing elit semper dalaracc lacus vel facilisis volutpat est velitom.',
       link:"https://www.slideshare.net/slideshow/eye-care-243533885/243533885"
     },
   ];
   export  const members = [
-    { name: 'List Albert', role: 'CEO & CO-FOUNDER', img: '../../../public/assets/TeamMembers/Lisa Albert.png',
+    { name: 'List Albert', role: 'CEO & CO-FOUNDER', img: '../../../assets/TeamMembers/Lisa Albert.png',
       desc: 'Lorem ipsum dolor sit amet consectetur adipiscing elit amet hendrerit pretium.',
       socials: ['facebook', 'twitter', 'linkedin'] },
-    { name: 'Sophie Moore', role: 'DENTAL SPECIALIST', img: '../../../public/assets/TeamMembers/sophie moore.png',
+    { name: 'Sophie Moore', role: 'DENTAL SPECIALIST', img: '../../../assets/TeamMembers/Sophie Moore.png',
       desc: 'Lorem ipsum dolor sit amet consectetur adipiscing elit amet hendrerit pretium.',
       socials: ['facebook', 'twitter', 'instagram', 'linkedin'] },
-    { name: 'Matt Cannon', role: 'ORTHOPEDIC', img: '../../../public/assets/TeamMembers/Matt Cannon.png',
+    { name: 'Matt Cannon', role: 'ORTHOPEDIC', img: '../../../assets/TeamMembers/Matt Cannon.png',
       desc: 'Lorem ipsum dolor sit amet consectetur adipiscing elit amet hendrerit pretium.',
       socials: ['facebook', 'twitter', 'linkedin'] },
-    { name: 'Andy Smith', role: 'BRAIN SURGEON', img: '../../../public/assets/TeamMembers/Andy Smith.png',
+    { name: 'Andy Smith', role: 'BRAIN SURGEON', img: '../../../assets/TeamMembers/Andy Smith.png',
       desc: 'Lorem ipsum dolor sit amet consectetur adipiscing elit amet hendrerit pretium.',
       socials: ['facebook', 'twitter', 'linkedin'] },
-    { name: 'Lily Woods', role: 'HEART SPECIALIST', img: '../../../public/assets/TeamMembers/Lily Woods.png',
+    { name: 'Lily Woods', role: 'HEART SPECIALIST', img: '../../../assets/TeamMembers/Lily Woods.png',
       desc: 'Lorem ipsum dolor sit amet consectetur adipiscing elit amet hendrerit pretium.',
       socials: ['facebook', 'twitter', 'instagram', 'linkedin'] },
-    { name: 'Patrick Meyer', role: 'EYE SPECIALIST', img: '../../../public/assets/TeamMembers/Patric Meyer.png',
+    { name: 'Patrick Meyer', role: 'EYE SPECIALIST', img: '../../../assets/TeamMembers/Patric Meyer.png',
       desc: 'Lorem ipsum dolor sit amet consectetur adipiscing elit amet hendrerit pretium.',
       socials: ['facebook', 'twitter','instagram', 'linkedin'] },
   ];

@@ -1,4 +1,5 @@
 import Doctor from "../Models/DoctorModel.js";
+import RefundRequest from "../Models/RefundRequest.js";
 export const GetLatestAppointments=async(req,res)=>{
     try {
        
@@ -108,3 +109,24 @@ export const DeleteAppointment=async(req,res)=>{
     res.status(500).json({ message: "Server error", error: error.message });
   }
 }
+export const TotalRefundRequest = async (req, res) => {
+  try {
+    // Count all documents in the RefundRequest collection
+    const RefundCount = await RefundRequest.countDocuments({status:"Approved"});
+
+    // Send success response with the count
+    return res.status(200).json({
+      success: true,
+      totalRefunds: RefundCount,
+    });
+  } catch (error) {
+    // Log the error for debugging
+    console.error("Error counting refund requests:", error.message);
+
+    // Send error response
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve refund request count",
+    });
+  }
+};

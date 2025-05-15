@@ -5,7 +5,8 @@ import toast from "react-hot-toast";
 
 const AddDoctor = () => {
   const [step, setStep] = useState(1);
-  const [isLoading, setIsLoading] = useState(false); // Added loading state
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
   const totalSteps = 3;
 
   const [formData, setFormData] = useState({
@@ -21,50 +22,167 @@ const AddDoctor = () => {
     about: "",
   });
 
+  // Validation functions
+  const validateName = (name) => {
+    if (!name) return "Name is required";
+    if (name.length < 2) return "Name must be at least 2 characters";
+    if (!/^[a-zA-Z\s]+$/.test(name)) return "Name can only contain letters and spaces";
+    return "";
+  };
+
+  const validateEmail = (email) => {
+    if (!email) return "Email is required";
+    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) return "Invalid email format";
+    return "";
+  };
+
+  const validatePassword = (password) => {
+    if (!password) return "Password is required";
+    if (password.length < 8) return "Password must be at least 8 characters";
+    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(password))
+      return "Password must include uppercase, lowercase, number, and special character";
+    return "";
+  };
+
+  const validateImage = (image) => {
+    if (!image) return "Image is required";
+    return "";
+  };
+
+  const validateSpecialty = (specialty) => {
+    if (!specialty) return "Specialty is required";
+    if (!specialtyOptions.includes(specialty)) return "Invalid specialty selected";
+    return "";
+  };
+
+  const validateFees = (fees) => {
+    if (!fees) return "Fees are required";
+    const numFees = Number(fees);
+    if (isNaN(numFees) || numFees < 10) return "Fees must be at least $10";
+    return "";
+  };
+
+  const validateDegree = (degree) => {
+    if (!degree) return "Degree is required";
+    if (degree.length < 2) return "Degree must be at least 2 characters";
+    if (!/^[a-zA-Z\s,.]+$/.test(degree)) return "Degree can only contain letters, spaces, commas, and periods";
+    return "";
+  };
+
+  const validateExperience = (experience) => {
+    if (experience === "") return "Experience is required";
+    const numExp = Number(experience);
+    if (isNaN(numExp) || numExp < 0 || numExp > 50) return "Experience must be between 0 and 50 years";
+    return "";
+  };
+
+  const validateAddress = (address) => {
+    if (!address) return "Address is required";
+    if (address.length < 5) return "Address must be at least 5 characters";
+    return "";
+  };
+
+  const validateAbout = (about) => {
+    if (!about) return "About is required";
+    if (about.length < 10) return "About must be at least 10 characters";
+    if (about.length > 500) return "About cannot exceed 500 characters";
+    return "";
+  };
+
+  // Validate current step
+  const validateStep = (currentStep) => {
+    const newErrors = {};
+    if (currentStep === 1) {
+      newErrors.name = validateName(formData.name);
+      newErrors.email = validateEmail(formData.email);
+      newErrors.password = validatePassword(formData.password);
+      newErrors.image = validateImage(formData.image);
+    } else if (currentStep === 2) {
+      newErrors.specialty = validateSpecialty(formData.specialty);
+      newErrors.fees = validateFees(formData.fees);
+      newErrors.degree = validateDegree(formData.degree);
+      newErrors.experience = validateExperience(formData.experience);
+    } else if (currentStep === 3) {
+      newErrors.address = validateAddress(formData.address);
+      newErrors.about = validateAbout(formData.about);
+    }
+    setErrors(newErrors);
+    return Object.values(newErrors).every((error) => error === "");
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" })); // Clear error on input change
   };
 
   const handleImage = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      
-      reader.onload = (event) => {
-        const imageUrl = event.target.result;
-        setFormData((prev) => ({ ...prev, image: imageUrl }));
-      };
+      // Validate file type and size
+      const validTypes = ["image/jpeg", "image/png", "image/gif"];
+      if (!validTypes.includes(file.type)) {
+        setErrors((prev) => ({ ...prev, image: "Only JPG, PNG, or GIF files are allowed" }));
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors((prev) => ({ ...prev, image: "Image size cannot exceed 5MB" }));
+        return;
+      }
 
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setFormData((prev) => ({ ...prev, image: event.target.result }));
+        setErrors((prev) => ({ ...prev, image: "" }));
+      };
       reader.onerror = (error) => {
         console.error("Error reading file:", error);
+        setErrors((prev) => ({ ...prev, image: "Error reading image file" }));
       };
-
       reader.readAsDataURL(file);
     }
   };
 
-  const nextStep = () => setStep((prev) => Math.min(prev + 1, totalSteps));
+  const nextStep = () => {
+    if (validateStep(step)) {
+      setStep((prev) => Math.min(prev + 1, totalSteps));
+    }
+  };
+
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Set loading to true when submission starts
-    
-    try {
-      const response = await axiosInstance.post('doctor/add-doctor', formData);
-      toast.success(response.data.message);
-    } catch (error) {
-      toast.error(error.response.data.message);
-    } finally {
-      setIsLoading(false); // Reset loading state regardless of success or failure
+    if (validateStep(step)) {
+      setIsLoading(true);
+      try {
+        const response = await axiosInstance.post("doctor/add-doctor", formData);
+        toast.success(response.data.message);
+        // Reset form after successful submission
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          image: null,
+          specialty: "",
+          fees: "",
+          degree: "",
+          experience: "",
+          address: "",
+          about: "",
+        });
+        setStep(1);
+        setErrors({});
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Failed to add doctor");
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
   return (
-    <>
-      
-          <div className="p-3 sm:p-4 lg:p-6 bg-white rounded-lg shadow-md border-t- border-teal-500">
+    <div className="p-3 sm:p-4 lg:p-6 bg-white rounded-lg shadow-md border-t-4 border-teal-500">
       <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-4 lg:mb-6">
         Add New Doctor
       </h2>
@@ -112,11 +230,15 @@ const AddDoctor = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base transition-all duration-200"
+                  className={`block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border ${
+                    errors.name ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base transition-all duration-200`}
                   placeholder="Dr. John Smith"
-                  required
-                  disabled={isLoading} // Disable input during loading
+                  disabled={isLoading}
                 />
+                {errors.name && (
+                  <p className="mt-1 text-xs text-red-500">{errors.name}</p>
+                )}
               </div>
               <div>
                 <label
@@ -131,11 +253,15 @@ const AddDoctor = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base transition-all duration-200"
+                  className={`block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border ${
+                    errors.email ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base transition-all duration-200`}
                   placeholder="john.smith@example.com"
-                  required
                   disabled={isLoading}
                 />
+                {errors.email && (
+                  <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+                )}
               </div>
             </div>
             <div className="mt-3 sm:mt-4">
@@ -151,11 +277,15 @@ const AddDoctor = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base transition-all duration-200"
+                className={`block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border ${
+                  errors.password ? "border-red-500" : "border-gray-300"
+                } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base transition-all duration-200`}
                 placeholder="••••••••"
-                required
                 disabled={isLoading}
               />
+              {errors.password && (
+                <p className="mt-1 text-xs text-red-500">{errors.password}</p>
+              )}
             </div>
             <div className="mt-3 sm:mt-4">
               <label
@@ -170,12 +300,17 @@ const AddDoctor = () => {
                 name="image"
                 onChange={handleImage}
                 accept="image/*"
-                className="block w-full text-xs sm:text-sm lg:text-base text-gray-500 file:mr-3 file:py-1 file:px-3 sm:file:py-2 sm:file:px-4 file:rounded-md file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 transition-all duration-200"
+                className={`block w-full text-xs sm:text-sm lg:text-base text-gray-500 file:mr-3 file:py-1 file:px-3 sm:file:py-2 sm:file:px-4 file:rounded-md file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 transition-all duration-200 ${
+                  errors.image ? "border-red-500" : ""
+                }`}
                 disabled={isLoading}
               />
               <p className="mt-1 text-[10px] sm:text-xs text-gray-500">
                 Upload JPG, PNG, or GIF (max 5MB)
               </p>
+              {errors.image && (
+                <p className="mt-1 text-xs text-red-500">{errors.image}</p>
+              )}
               {formData.image && (
                 <div className="mt-2">
                   <img
@@ -207,8 +342,9 @@ const AddDoctor = () => {
                   name="specialty"
                   value={formData.specialty}
                   onChange={handleInputChange}
-                  className="block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base bg-white transition-all duration-200"
-                  required
+                  className={`block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border ${
+                    errors.specialty ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base bg-white transition-all duration-200`}
                   disabled={isLoading}
                 >
                   <option value="">Select Specialty</option>
@@ -218,6 +354,9 @@ const AddDoctor = () => {
                     </option>
                   ))}
                 </select>
+                {errors.specialty && (
+                  <p className="mt-1 text-xs text-red-500">{errors.specialty}</p>
+                )}
               </div>
               <div>
                 <label
@@ -234,11 +373,15 @@ const AddDoctor = () => {
                   onChange={handleInputChange}
                   min="0"
                   step="0.01"
-                  className="block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base transition-all duration-200"
+                  className={`block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border ${
+                    errors.fees ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base transition-all duration-200`}
                   placeholder="150.00"
-                  required
                   disabled={isLoading}
                 />
+                {errors.fees && (
+                  <p className="mt-1 text-xs text-red-500">{errors.fees}</p>
+                )}
               </div>
             </div>
             <div className="mt-3 sm:mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -255,11 +398,15 @@ const AddDoctor = () => {
                   name="degree"
                   value={formData.degree}
                   onChange={handleInputChange}
-                  className="block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base transition-all duration-200"
+                  className={`block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border ${
+                    errors.degree ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base transition-all duration-200`}
                   placeholder="MD, MBBS, etc."
-                  required
                   disabled={isLoading}
                 />
+                {errors.degree && (
+                  <p className="mt-1 text-xs text-red-500">{errors.degree}</p>
+                )}
               </div>
               <div>
                 <label
@@ -275,11 +422,15 @@ const AddDoctor = () => {
                   value={formData.experience}
                   onChange={handleInputChange}
                   min="0"
-                  className="block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base transition-all duration-200"
+                  className={`block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border ${
+                    errors.experience ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base transition-all duration-200`}
                   placeholder="10"
-                  required
                   disabled={isLoading}
                 />
+                {errors.experience && (
+                  <p className="mt-1 text-xs text-red-500">{errors.experience}</p>
+                )}
               </div>
             </div>
           </div>
@@ -303,11 +454,15 @@ const AddDoctor = () => {
                 value={formData.address}
                 onChange={handleInputChange}
                 rows="2"
-                className="block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base transition-all duration-200"
+                className={`block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border ${
+                  errors.address ? "border-red-500" : "border-gray-300"
+                } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base transition-all duration-200`}
                 placeholder="123 Health St, Medical City"
-                required
                 disabled={isLoading}
               />
+              {errors.address && (
+                <p className="mt-1 text-xs text-red-500">{errors.address}</p>
+              )}
             </div>
             <div className="mt-3 sm:mt-4">
               <label
@@ -322,11 +477,15 @@ const AddDoctor = () => {
                 value={formData.about}
                 onChange={handleInputChange}
                 rows="3"
-                className="block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base transition-all duration-200"
+                className={`block w-full px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-2.5 border ${
+                  errors.about ? "border-red-500" : "border-gray-300"
+                } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-xs sm:text-sm lg:text-base transition-all duration-200`}
                 placeholder="Brief bio or professional summary"
-                required
                 disabled={isLoading}
               />
+              {errors.about && (
+                <p className="mt-1 text-xs text-red-500">{errors.about}</p>
+              )}
             </div>
           </div>
         )}
@@ -399,9 +558,6 @@ const AddDoctor = () => {
         </div>
       </form>
     </div>
-
-    </>
-   
   );
 };
 

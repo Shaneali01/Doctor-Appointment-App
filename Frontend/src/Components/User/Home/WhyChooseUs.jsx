@@ -24,7 +24,7 @@ export default function WhyChooseUs() {
             <button onClick={()=>{navigate('/doctors')}} className="bg-teal-700 text-white font-bold py-2 px-7 rounded-full shadow-lg hover:bg-teal-700 transition-all">
               Get started
             </button>
-            <button className="bg-white border border-gray-300 text-gray-700 font-bold py-2 px-6 rounded-full shadow-md hover:bg-gray-100 transition-all">
+            <button onClick={()=>{navigate("/contact")}} className="bg-white border border-gray-300 text-gray-700 font-bold py-2 px-6 rounded-full shadow-md hover:bg-gray-100 transition-all">
               Talk to sales
             </button>
           </div>

@@ -4,6 +4,17 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { ChevronDown, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix for Leaflet marker icon issue in React
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
 
 const ContactForm = () => {
   useEffect(() => {
@@ -215,128 +226,156 @@ const ContactForm = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-6 rounded-2xl w-full max-w-2xl">
-        <div className="grid grid-cols-1 text-gray-700 sm:grid-cols-2 gap-6 mb-4">
-          <div className="flex flex-col">
-            <label className="mb-2 font-medium">First Name *</label>
-            <input
-              type="text"
-              name="firstName"
-              placeholder="Enter your first name"
-              className={`border-2 p-2 rounded-md ${errors.firstName ? 'border-red-500' : 'border-[#007E85]'}`}
-              value={formData.firstName}
-              onChange={handleChange}
-              onBlur={() => validateField('firstName', formData.firstName)}
-              disabled={isLoading}
-            />
-            {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
+      <div className="w-full max-w-7xl mt-8 px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div data-aos='fade-up' className="p-6 rounded-2xl w-full">
+            <h3 className="text-xl font-bold text-gray-700 mb-4">Contact Us</h3>
+            <form onSubmit={handleSubmit} className="w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4">
+                <div className="flex flex-col">
+                  <label className="mb-2 font-medium">First Name *</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    placeholder="Enter your first name"
+                    className={`border-2 p-2 rounded-md ${errors.firstName ? 'border-red-500' : 'border-[#007E85]'}`}
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    onBlur={() => validateField('firstName', formData.firstName)}
+                    disabled={isLoading}
+                  />
+                  {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
+                </div>
+                <div className="flex flex-col">
+                  <label className="mb-2 font-medium">Last Name</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    placeholder="Enter your last name"
+                    className={`border-2 p-2 rounded-md ${errors.lastName ? 'border-red-500' : 'border-[#007E85]'}`}
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    onBlur={() => validateField('lastName', formData.lastName)}
+                    disabled={isLoading}
+                  />
+                  {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4">
+                <div className="flex flex-col">
+                  <label className="mb-2 font-medium">Email *</label>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    className={`border-2 p-2 rounded-md ${errors.email ? 'border-red-500' : 'border-[#007E85]'}`}
+                    value={formData.email}
+                    onChange={handleChange}
+                    onBlur={() => validateField('email', formData.email)}
+                    disabled={isLoading}
+                  />
+                  {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                </div>
+                <div className="flex flex-col">
+                  <label className="mb-2 font-medium">Phone</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Enter your phone number"
+                    className={`border-2 p-2 rounded-md ${errors.phone ? 'border-red-500' : 'border-[#007E85]'}`}
+                    value={formData.phone}
+                    onChange={handleChange}
+                    onBlur={() => validateField('phone', formData.phone)}
+                    disabled={isLoading}
+                  />
+                  {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                </div>
+              </div>
+              <div className="flex flex-col mb-4">
+                <label className="mb-2 font-medium">Topic</label>
+                <select
+                  name="topic"
+                  className={`border-2 p-2 rounded-md ${errors.topic ? 'border-red-500' : 'border-[#007E85]'}`}
+                  value={formData.topic}
+                  onChange={handleChange}
+                  onBlur={() => validateField('topic', formData.topic)}
+                  disabled={isLoading}
+                >
+                  <option value="">Select one...</option>
+                  <option value="support">Support</option>
+                  <option value="sales">Sales</option>
+                  <option value="general">General Inquiry</option>
+                </select>
+                {errors.topic && <p className="text-red-500 text-xs mt-1">{errors.topic}</p>}
+              </div>
+              <div className="flex flex-col mb-4">
+                <label className="mb-2 font-medium">Message *</label>
+                <textarea
+                  name="message"
+                  placeholder="Type your message..."
+                  className={`border-2 p-2 rounded-md w-full ${errors.message ? 'border-red-500' : 'border-[#007E85]'}`}
+                  rows="4"
+                  value={formData.message}
+                  onChange={handleChange}
+                  onBlur={() => validateField('message', formData.message)}
+                  disabled={isLoading}
+                ></textarea>
+                {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message}</p>}
+              </div>
+              <div className="flex items-center mb-4">
+                <input
+                  type="checkbox"
+                  name="termsAccepted"
+                  className={`mr-2 ${errors.termsAccepted ? 'border-red-500' : ''}`}
+                  checked={formData.termsAccepted}
+                  onChange={handleChange}
+                  onBlur={() => validateField('termsAccepted', formData.termsAccepted)}
+                  disabled={isLoading}
+                />
+                <label>I accept the terms *</label>
+                {errors.termsAccepted && <p className="text-red-500 text-xs ml-2">{errors.termsAccepted}</p>}
+              </div>
+              <button
+                type="submit"
+                className="bg-[#007E85] text-white px-4 py-2 rounded-md w-full hover:bg-teal-700 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 text-teal-500 animate-spin mr-2" />
+                    Submitting...
+                  </>
+                ) : (
+                  'Submit'
+                )}
+              </button>
+            </form>
           </div>
-          <div className="flex flex-col">
-            <label className="mb-2 font-medium">Last Name</label>
-            <input
-              type="text"
-              name="lastName"
-              placeholder="Enter your last name"
-              className={`border-2 p-2 rounded-md ${errors.lastName ? 'border-red-500' : 'border-[#007E85]'}`}
-              value={formData.lastName}
-              onChange={handleChange}
-              onBlur={() => validateField('lastName', formData.lastName)}
-              disabled={isLoading}
-            />
-            {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4">
-          <div className="flex flex-col">
-            <label className="mb-2 font-medium">Email *</label>
-            <input
-              type="email"
-              name="email"
-              placeholder="Enter your email"
-              className={`border-2 p-2 rounded-md ${errors.email ? 'border-red-500' : 'border-[#007E85]'}`}
-              value={formData.email}
-              onChange={handleChange}
-              onBlur={() => validateField('email', formData.email)}
-              disabled={isLoading}
-            />
-            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-2 font-medium">Phone</label>
-            <input
-              type="tel"
-              name="phone"
-              placeholder="Enter your phone number"
-              className={`border-2 p-2 rounded-md ${errors.phone ? 'border-red-500' : 'border-[#007E85]'}`}
-              value={formData.phone}
-              onChange={handleChange}
-              onBlur={() => validateField('phone', formData.phone)}
-              disabled={isLoading}
-            />
-            {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
-          </div>
-        </div>
-        <div className="flex flex-col mb-4">
-          <label className="mb-2 font-medium">Topic</label>
-          <select
-            name="topic"
-            className={`border-2 p-2 rounded-md ${errors.topic ? 'border-red-500' : 'border-[#007E85]'}`}
-            value={formData.topic}
-            onChange={handleChange}
-            onBlur={() => validateField('topic', formData.topic)}
-            disabled={isLoading}
-          >
-            <option value="">Select one...</option>
-            <option value="support">Support</option>
-            <option value="sales">Sales</option>
-            <option value="general">General Inquiry</option>
-          </select>
-          {errors.topic && <p className="text-red-500 text-xs mt-1">{errors.topic}</p>}
-        </div>
-        <div className="flex flex-col mb-4">
-          <label className="mb-2 font-medium">Message *</label>
-          <textarea
-            name="message"
-            placeholder="Type your message..."
-            className={`border-2 p-2 rounded-md w-full ${errors.message ? 'border-red-500' : 'border-[#007E85]'}`}
-            rows="4"
-            value={formData.message}
-            onChange={handleChange}
-            onBlur={() => validateField('message', formData.message)}
-            disabled={isLoading}
-          ></textarea>
-          {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message}</p>}
-        </div>
-        <div className="flex items-center mb-4">
-          <input
-            type="checkbox"
-            name="termsAccepted"
-            className={`mr-2 ${errors.termsAccepted ? 'border-red-500' : ''}`}
-            checked={formData.termsAccepted}
-            onChange={handleChange}
-            onBlur={() => validateField('termsAccepted', formData.termsAccepted)}
-            disabled={isLoading}
-          />
-          <label>I accept the terms *</label>
-          {errors.termsAccepted && <p className="text-red-500 text-xs ml-2">{errors.termsAccepted}</p>}
-        </div>
-        <button
-          type="submit"
-          className="bg-[#007E85] text-white px-4 py-2 rounded-md w-full hover:bg-teal-700 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="w-5 h-5 text-teal-500 animate-spin mr-2" />
-              Submitting...
-            </>
-          ) : (
-            'Submit'
-          )}
-        </button>
-      </form>
 
-      <NewsletterForm />
+          <div data-aos='fade-up' className="p-6 rounded-2xl w-full">
+            <h3 className="text-xl font-bold text-gray-700 mb-4">Our Location</h3>
+            <div className="h-96 w-full rounded-md overflow-hidden border-2 border-[#007E85]">
+              <MapContainer
+                center={[40.7589, -73.9851]} // Example: New York City (Times Square area)
+                zoom={15}
+                style={{ height: '100%', width: '100%' }}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                <Marker position={[40.7589, -73.9851]}>
+                  <Popup>
+                    DocLink Office<br />
+                    123 Health St, New York, NY
+                  </Popup>
+                </Marker>
+              </MapContainer>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 };

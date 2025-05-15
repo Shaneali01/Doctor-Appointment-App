@@ -6,9 +6,10 @@ import DoctorList from "../../Components/Admin/DoctorList";
 import Appointments from "../../Components/Admin/Appoinments";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { LayoutDashboard, Calendar, UserPlus, Users } from "lucide-react";
+import { LayoutDashboard, Calendar, UserPlus, Users,ChartSpline } from "lucide-react";
 import { AdminNavbar } from "../../Components/Admin/AdminNavbar";
 import FullDetails from "../../Components/Admin/DoctorProfile";
+import Analytics from "../../Components/Admin/Analytics";
 
 // Category icons for the sidebar
 const categoryIcons = {
@@ -16,6 +17,8 @@ const categoryIcons = {
   Appointments: <Calendar className="w-5 h-5" />,
   "Add Doctor": <UserPlus className="w-5 h-5" />,
   "Doctor List": <Users className="w-5 h-5" />,
+  "Analytics": <ChartSpline className="w-5 h-5" />,
+
 };
 
 const AdminPage = () => {
@@ -28,6 +31,7 @@ const AdminPage = () => {
     "/appointments": "Appointments",
     "/add-doctor": "Add Doctor",
     "/doctor-list": "Doctor List",
+    "/analytics": "Analytics",
   };
 
   // Derive selectedCategory from the current URL
@@ -49,7 +53,7 @@ const AdminPage = () => {
     });
   }, []);
 
-  const categories = ["Dashboard", "Appointments", "Add Doctor", "Doctor List"];
+  const categories = ["Dashboard", "Appointments", "Add Doctor", "Doctor List","Analytics"];
 
   // Map category names to URL paths for navigation
   const categoryToPath = {
@@ -57,6 +61,7 @@ const AdminPage = () => {
     Appointments: "/appointments",
     "Add Doctor": "/add-doctor",
     "Doctor List": "/doctor-list",
+    Analytics: "/analytics",
   };
 
   // Handle category click to navigate to the corresponding route
@@ -73,6 +78,7 @@ const AdminPage = () => {
       <Route path="/add-doctor" element={<AddDoctor />} />
       <Route path="/doctor-list" element={<DoctorList />} />
       <Route path="/doctors/:id" element={<FullDetails />} />
+      <Route path="/analytics" element={<Analytics />} />
 
       {/* Default route */}
       <Route path="*" element={<Dashboard />} />

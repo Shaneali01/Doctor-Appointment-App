@@ -8,7 +8,6 @@ import DoctorApplication from "../Pages/User/DoctorApply";
 import Profile from "../Components/User/Profile";
 import BookedAppointments from "../Pages/User/BookedAppointments";
 import AppointmentSuccess from "../Pages/User/AppointmentSuccess";
-import AdminRefundRequests from "../Pages/User/RefundRequestForm";
 import RefundRequestForm from "../Pages/User/RefundRequestForm";
 import ChatPage from "../Pages/Chatbot/ChatPage";
 import ResetPassword from "../Pages/Auth/ResetPassword";

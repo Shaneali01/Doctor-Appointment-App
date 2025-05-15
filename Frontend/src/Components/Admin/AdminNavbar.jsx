@@ -10,20 +10,32 @@ export const AdminNavbar = () => {
   const [notifications, setNotifications] = useState([]);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const notificationRef = useRef(null);
   const user = JSON.parse(localStorage.getItem('User') || '{}');
   const token = localStorage.getItem('Token');
 
+  // Handle scroll event
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   // Fetch notifications
   const fetchNotifications = async () => {
-    if (isClearing) return; // Skip fetch during clear
+    if (isClearing) return;
     try {
       const response = await axiosInstance.get(`/user/get-notifications/${user.id}`);
       setNotifications(response.data || []);
     } catch (err) {
       toast.error('Failed to fetch notifications');
       console.error('Notifications fetch error:', err);
-      setNotifications([]); // No fallback to avoid fake notifications
+      setNotifications([]);
     }
   };
 
@@ -32,11 +44,11 @@ export const AdminNavbar = () => {
     if (token && user.id) {
       fetchNotifications();
     }
-  }, [token, user._id]);
+  }, [token, user.id]);
 
   useEffect(() => {
     const handleRefreshNotifications = () => {
-      if (token && user._id && !isClearing) {
+      if (token && user.id && !isClearing) {
         fetchNotifications();
       }
     };
@@ -44,7 +56,7 @@ export const AdminNavbar = () => {
     return () => {
       window.removeEventListener('refreshNotifications', handleRefreshNotifications);
     };
-  }, [token, user._id, isClearing]);
+  }, [token, user.id, isClearing]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -63,7 +75,7 @@ export const AdminNavbar = () => {
   const handleClearNotifications = async () => {
     try {
       setIsClearing(true);
-      const response = await axiosInstance.delete(`/user/clear-notifications/${user.id}`);
+      await axiosInstance.delete(`/user/clear-notifications/${user.id}`);
       setNotifications([]);
       toast.success('Notifications cleared');
     } catch (err) {
@@ -82,33 +94,46 @@ export const AdminNavbar = () => {
   };
 
   return (
-    <nav className="p-4 fixed navbar text-gray-700 top-0 left-0 w-full z-50 h-16 flex items-center  font-lato">
-      <div className="container mx-auto flex justify-between items-center">
+    <nav
+      className={`fixed top-0 left-0 w-full z-50 h-16 sm:h-20 flex items-center font-lato transition-all duration-300 ${
+        isScrolled ? 'bg-white shadow-md' : 'bg-transparent'
+      } px-4 sm:px-6 md:px-8`}
+    >
+      <div className="w-full max-w-[100vw] flex justify-between items-center">
         {/* Logo */}
         <Link to="/admin/dashboard" className="flex items-center">
-          <img src={logo} alt="Logo" className="h-52 w-auto object-contain" />
+          <img
+            src={logo}
+            alt="Logo"
+            className="lg:h-48 md:h-44 sm:h-36 h-36 w-auto object-contain"
+          />
         </Link>
 
         {/* Notification and Log Out Buttons */}
-        <div className="flex space-x-4 items-center">
+        <div className="flex items-center space-x-2 sm:space-x-4">
           {/* Notification Button */}
           <div className="relative" ref={notificationRef}>
             <button
               onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-              className="relative flex items-center focus:outline-none p-2"
+              className="relative flex items-center focus:outline-none p-1 sm:p-2"
               aria-label="View notifications"
             >
-              <Bell size={24} className="text-[#008080] hover:text-[#006666] transition-colors duration-200" />
+              <Bell
+                size={20}
+                className="text-[#008080] hover:text-[#006666] transition-colors duration-200"
+              />
               {notifications.length > 0 && (
-                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center">
                   {notifications.length}
                 </span>
               )}
             </button>
             {isNotificationsOpen && (
-              <div className="absolute right-0 mt-3 w-56 max-h-96 overflow-y-auto bg-white rounded-lg shadow-xl z-50 border border-gray-100 transform transition-all duration-300 ease-in-out scale-95 opacity-0 animate-dropdown">
+              <div className="absolute right-0 mt-2 w-64 sm:w-72 max-h-96 overflow-y-auto bg-white rounded-lg shadow-xl z-50 border border-gray-100 transform transition-all duration-300 ease-in-out scale-95 opacity-0 animate-dropdown">
                 {notifications.length === 0 ? (
-                  <p className="px-4 py-3 text-gray-700 text-sm text-center">No notifications</p>
+                  <p className="px-4 py-3 text-gray-700 text-sm text-center">
+                    No notifications
+                  </p>
                 ) : (
                   <>
                     {notifications.map((notification) => (
@@ -125,14 +150,14 @@ export const AdminNavbar = () => {
                     <div className="sticky bottom-0 bg-white border-t border-gray-100">
                       <button
                         onClick={fetchNotifications}
-                        className="w-full text-left px-4 py-3 text-gray-700 hover:bg-[#008080] hover:text-white transition-colors duration-200 flex items-center gap-2"
+                        className="w-full text-left px-4 py-3 text-gray-700 hover:bg-[#008080] hover:text-white transition-colors duration-200 flex items-center gap-2 text-sm"
                         aria-label="Refresh notifications"
                       >
-                        <RefreshCw size={16} /> Refresh Notifications
+                        <RefreshCw size={14} /> Refresh Notifications
                       </button>
                       <button
                         onClick={handleClearNotifications}
-                        className="w-full text-left px-4 py-3 text-gray-700 hover:bg-[#008080] hover:text-white rounded-b-lg transition-colors duration-200"
+                        className="w-full text-left px-4 py-3 text-gray-700 hover:bg-[#008080] hover:text-white rounded-b-lg transition-colors duration-200 text-sm"
                         aria-label="Clear all notifications"
                       >
                         Clear Notifications
@@ -147,10 +172,10 @@ export const AdminNavbar = () => {
           {/* Log Out Button */}
           <button
             onClick={handleLogout}
-            className="bg-[#008080] text-white py-2 px-4 rounded-md font-semibold hover:bg-[#006666] flex items-center"
+            className="bg-[#008080] text-white py-1 px-2 sm:py-2 sm:px-4 rounded-md font-semibold hover:bg-[#006666] flex items-center text-sm sm:text-base"
           >
-            <LogOut size={20} className="mr-2" />
-            Log Out
+            <LogOut size={16} className="mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Log Out</span>
           </button>
         </div>
       </div>
@@ -169,6 +194,15 @@ export const AdminNavbar = () => {
         }
         .animate-dropdown {
           animation: dropdown 0.2s ease-out forwards;
+        }
+        @media (max-width: 640px) {
+          .navbar {
+            height: 14rem; /* Increased height to accommodate large logo */
+          }
+          .animate-dropdown {
+            width: 90vw; /* Full width minus padding on mobile */
+            right: 0.5rem;
+          }
         }
       `}</style>
     </nav>
