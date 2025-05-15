@@ -52,7 +52,7 @@ const Hero = () => {
         <div className="flex gap-4 justify-center md:justify-start mt-4">
           <button 
             onClick={HandleClick}
-            className="bg-[#007E85] cursor-pointer text-white px-2 py-1 sm:px-4 sm:py-2 md:px-6 md:py-3 rounded-full text-lg font-semibold shadow-lg hover:bg-teal-600 transition duration-300 flex items-center gap-2"
+            className="bg-[#007E85] cursor-pointer text-white px-4 py-1 sm:px-4 sm:py-2 md:px-6 md:py-3 rounded-full text-lg font-semibold shadow-lg hover:bg-teal-600 transition duration-300 flex items-center gap-2"
           >
             <PhoneCall className="w-5 h-5" /> Appointments
           </button>
