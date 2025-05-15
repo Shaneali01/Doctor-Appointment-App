@@ -7,11 +7,11 @@ import ScrollToTop from "./Components/Common/ScrollTop";
 import AiButton from "./Components/Common/AiButton";
 import NewsletterForm from "./Components/Common/NewsLetter";
 import UserRoutes from "./Routes/UserRoute";
-import Login from "../src/pages/Auth/Login";
 import Signup from "../src/Pages/Auth/Signup";
 import AdminRoutes from "./Routes/AdminRoutes";
 import DoctorRoutes from "./Routes/DoctorRoutes";
 import NotFound from "./Pages/User/NotFound";
+import Login from "./Pages/Auth/Login";
 
 function App() {
   const location = useLocation();
