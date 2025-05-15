@@ -16,7 +16,7 @@ app.use(cors({
     credentials: true                 // Allow cookies and authorization headers
   }));
 app.use(express.json({limit: '50mb'}));
-mongoose.connect((process.env.Mongo_URI))
+mongoose.connect((process.env.MONGO_URI))
 .then(() => {
     console.log('Connected to MongoDB');
 })
