@@ -32,6 +32,6 @@ app.use('/api/user', UserRoutes);
 app.use("/api/refund",Refund);
 app.use("/api/admin",AdminRoute)
 app.use("/api/chatbot",Chatbot)
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT || 5000, () => {
     console.log('Server started on port 5000');
 })

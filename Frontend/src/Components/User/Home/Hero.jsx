@@ -25,7 +25,7 @@ const Hero = () => {
 
   return (
     <section
-      className="relative py-16 px-6 md:px-12 lg:pl-20 font-sans flex flex-col md:flex-row items-center justify-between min-h-screen w-full overflow-hidden"
+      className="relative py-16  md:px-12 lg:pl-20 font-sans flex flex-col md:flex-row items-center justify-between min-h-screen w-full overflow-hidden"
     >
       {/* Wave Background */}
       <div
@@ -38,7 +38,7 @@ const Hero = () => {
       />
 
       {/* Left Side - Text Content */}
-      <div data-aos="fade-left" style={{ fontFamily: 'lato' }} className="md:w-2/3 space-y-6 font-semi-bold text-center md:text-left relative z-10">
+      <div data-aos="fade-left" style={{ fontFamily: 'lato' }} className=" space-y-6 font-semi-bold text-center md:text-left relative z-10">
         <h1 className="text-3xl font-bold text-gray-700 mt-6 lg:text-5xl  leading-tight">
           Providing Quality <span className="text-[#007E85]">Healthcare</span> For A
           <br />
@@ -52,7 +52,7 @@ const Hero = () => {
         <div className="flex gap-4 justify-center md:justify-start mt-4">
           <button 
             onClick={HandleClick}
-            className="bg-[#007E85] cursor-pointer text-white px-6 py-3 rounded-full text-lg font-semibold shadow-lg hover:bg-teal-600 transition duration-300 flex items-center gap-2"
+            className="bg-[#007E85] cursor-pointer text-white px-2 py-1 sm:px-4 sm:py-2 md:px-6 md:py-3 rounded-full text-lg font-semibold shadow-lg hover:bg-teal-600 transition duration-300 flex items-center gap-2"
           >
             <PhoneCall className="w-5 h-5" /> Appointments
           </button>

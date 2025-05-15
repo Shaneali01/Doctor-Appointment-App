@@ -13,7 +13,7 @@ export default function WhyChooseUs() {
     <div  className=" py-12 px-6 md:px-16">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         <div data-aos="fade-left" className="text-left">
-          <h2 className="text-5xl font-semibold text-teal-800 mb-4">
+          <h2 className="md:text-5xl text-4xl font-semibold text-teal-800 mb-4">
             You have lots of reasons <br /> to choose us
           </h2>
           <p className="text-gray-600 mb-6 font-bold">
