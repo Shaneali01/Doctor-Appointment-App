@@ -11,7 +11,7 @@ import Chatbot from "./Routes/Chatbot.js"
 dotenv.config();
 const app=express();
 app.use(cors({
-    origin: "http://localhost:5173",  // Allow only your frontend origin
+    origin: "https://doctor-appointment-app-sigma.vercel.app",  // Allow only your frontend origin
     methods: "GET,POST,PUT,DELETE",   // Allowed HTTP methods
     credentials: true                 // Allow cookies and authorization headers
   }));
